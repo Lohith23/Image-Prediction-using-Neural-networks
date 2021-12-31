@@ -1,0 +1,57 @@
+#Importing stuffs
+
+import tensorflow as tf
+from tensorflow import keras
+import numpy as np
+import matplotlib.pyplot as plt
+
+#Calling Data
+
+data = keras.datasets.cifar10.load_data()
+(x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
+
+assert x_train.shape == (50000, 32, 32, 3)
+assert x_test.shape == (10000, 32, 32, 3)
+assert y_train.shape ==(50000, 1)
+assert y_test.shape == (10000, 1)
+
+#Customizing Data
+
+x_train = x_train/255.0
+x_test = x_test/255.0
+
+Class_names = ["airplane", "automobile", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
+
+#Defining The Layers
+
+cnn = keras.Sequential([
+      keras.layers.Conv2D(filters=32, kernel_size=(3,3), activation="relu", input_shape=(32,32,3)),
+      keras.layers.Conv2D(filters=64, kernel_size=(3,3), activation="relu"),
+      keras.layers.MaxPooling2D((2,2)),
+      keras.layers.Flatten(),
+      keras.layers.Dense(128, activation="relu"),
+      keras.layers.Dense(10, activation="softmax")
+      ])
+
+#Model compiling and fiting
+
+cnn.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
+cnn.fit(x_train, y_train, epochs= 10)
+
+#Evaluating The Model
+
+test_acc, test_loss = cnn.evaluate(x_train, y_train)
+print("TESTED ACC:", test_acc)
+
+#Plotting
+
+y_test = y_test.reshape(-1,)
+
+prediction = model.predict(x_test)
+
+for i in range(10):
+    plt.grid(False)
+    plt.imshow(x_test[i], cmap=plt.cm.binary)
+    plt.xlabel("Actual: " + Class_names[y_test[i]])
+    plt.title("Prediction" + Class_names[np.argmax(prediction[i])])
+    plt.show()
